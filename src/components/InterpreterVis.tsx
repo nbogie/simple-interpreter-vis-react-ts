@@ -20,10 +20,19 @@ jnz a -1
 inc a`;
 
     const [rawProgramText, setRawProgramText] = useState(exampleProgramRaw);
-    const [state, setState] = useState<InterpreterStateWithHistory>(() => ({
-        ...createInitialInterpreterState(exampleProgramRaw.split("\n")),
-        pastInstructions: [],
-    }));
+    const [isRawProgramTextDirty, setIsRawProgramTextDirty] = useState(false);
+    const [state, setState] = useState<InterpreterStateWithHistory>(() =>
+        createStateForProgramText(rawProgramText)
+    );
+
+    function createStateForProgramText(
+        programText: string
+    ): InterpreterStateWithHistory {
+        return {
+            ...createInitialInterpreterState(programText.split("\n")),
+            pastInstructions: [],
+        };
+    }
 
     function handleReset() {
         setState((prevState) => ({
@@ -72,19 +81,21 @@ inc a`;
         <section>
             <h1>Interpreter Vis</h1>
             <div className="mainGrid">
-                <div>
-                    <strong>Raw Program Text:</strong>
-                    <br />
-                    <textarea
-                        rows={10}
-                        cols={10}
-                        value={rawProgramText}
-                        onChange={(e) => setRawProgramText(e.target.value)}
-                    />
-                </div>
+                <RawProgramView
+                    {...{
+                        rawProgramText,
+                        setRawProgramText,
+                        isRawProgramTextDirty,
+                        setIsRawProgramTextDirty,
+                        submitNewProgram: () => {
+                            setState(createStateForProgramText(rawProgramText));
+                        },
+                    }}
+                />
                 <RegistersView state={state} />
                 <ProgramView state={state} />
             </div>
+
             <button disabled={isAtEndOfProgram(state)} onClick={handleStep}>
                 {isAtEndOfProgram(state) ? "Ended" : "Step ▶️"}
             </button>
@@ -230,4 +241,45 @@ function explanationForInstruction(instruction: Instruction): JSX.Element {
         default:
             throw new Error("Unknown instruction: " + instruction);
     }
+}
+interface RawProgramViewProps {
+    rawProgramText: string;
+    setRawProgramText: (newText: string) => void;
+    isRawProgramTextDirty: boolean;
+    setIsRawProgramTextDirty: (newDirty: boolean) => void;
+    submitNewProgram: (newText: string) => void;
+}
+function RawProgramView({
+    rawProgramText,
+    setRawProgramText,
+    isRawProgramTextDirty,
+    setIsRawProgramTextDirty,
+    submitNewProgram,
+}: RawProgramViewProps) {
+    return (
+        <div>
+            <strong>Raw Program Text:</strong>
+            <br />
+            <textarea
+                rows={10}
+                cols={10}
+                value={rawProgramText}
+                onChange={(e) => {
+                    setRawProgramText(e.target.value);
+                    setIsRawProgramTextDirty(true);
+                }}
+                className={isRawProgramTextDirty ? "dirty" : "parsed"}
+            />
+            <br />
+            <button
+                onClick={() => {
+                    submitNewProgram(rawProgramText);
+                    setIsRawProgramTextDirty(false);
+                }}
+                disabled={!isRawProgramTextDirty}
+            >
+                {isRawProgramTextDirty ? "parse" : "parsed"}
+            </button>
+        </div>
+    );
 }

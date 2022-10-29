@@ -103,3 +103,6 @@ button:focus-visible {
 textArea {
     padding: 0.4rem;
 }
+textArea.dirty {
+    outline: 2px solid purple;
+}
