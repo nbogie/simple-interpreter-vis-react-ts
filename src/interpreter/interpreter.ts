@@ -22,18 +22,66 @@ export function getNextInstruction(
     return state.instructions[state.programCounter] ?? null;
 }
 
+export type InstructionParseError = {
+    rawString: string;
+    lineNumber: number;
+    error: string;
+};
+export function parseInstructionsCollectingErrors(
+    instructionStrings: string[]
+): [Instruction[], InstructionParseError[]] {
+    const instructions: Instruction[] = [];
+    const errors: InstructionParseError[] = [];
+    for (let i = 0; i < instructionStrings.length; i++) {
+        const instrString: string = instructionStrings[i];
+        try {
+            const instruction: Instruction = parseInstruction(instrString);
+            instructions.push(instruction);
+        } catch (error) {
+            errors.push({
+                error: "" + error,
+                lineNumber: i,
+                rawString: instrString,
+            } as InstructionParseError);
+        }
+    }
+    return [instructions, errors];
+}
+
+export function createInitialEmptyInterpreterState(): InterpreterState {
+    return { registers: {}, programCounter: 0, instructions: [] };
+}
+
 export function createInitialInterpreterState(
     instructionStrings: string[]
-): InterpreterState {
-    const instructions: Instruction[] =
-        instructionStrings.map(parseInstruction);
-
+):
+    | { type: "success"; state: InterpreterState }
+    | { type: "errors"; errors: InstructionParseError[] } {
     const registers: Registers = {};
     let programCounter: ProgramCounter = 0;
-    return { registers, programCounter, instructions };
+
+    const [instructions, errors] =
+        parseInstructionsCollectingErrors(instructionStrings);
+
+    if (errors.length > 0) {
+        return { type: "errors", errors };
+    } else {
+        return {
+            type: "success",
+            state: { registers, programCounter, instructions },
+        };
+    }
 }
 export function interpret(instructionStrings: string[]): Registers {
-    const state = createInitialInterpreterState(instructionStrings);
+    const stateOrErrors = createInitialInterpreterState(instructionStrings);
+    if (stateOrErrors.type === "errors") {
+        throw new Error(
+            "Error parsing instructions: " +
+                JSON.stringify(stateOrErrors.errors, null, 2)
+        );
+    }
+    const state = stateOrErrors.state;
+
     //Validate and structure the instructions
     while (state.programCounter < state.instructions.length) {
         const instruction = state.instructions[state.programCounter];
