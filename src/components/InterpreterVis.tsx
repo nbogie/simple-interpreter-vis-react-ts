@@ -124,12 +124,19 @@ export function InterpreterVis() {
                 <ProgramView state={state} />
             </div>
 
+            <hr />
             <button disabled={isAtEndOfProgram(state)} onClick={handleStep}>
                 {isAtEndOfProgram(state) ? "Ended" : "Step ▶️"}
             </button>
 
             <button onClick={handleReset}>Reset ⏮</button>
-            <button onClick={handleRunToEnd}>Run to end ⏭</button>
+            <button
+                disabled={true}
+                onClick={handleRunToEnd}
+                title={"not yet implemented"}
+            >
+                Run to end ⏭
+            </button>
 
             <ExplainView state={state} />
             <HistoryView state={state} />

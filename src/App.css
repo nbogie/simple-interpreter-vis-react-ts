@@ -30,6 +30,10 @@ a:hover {
     color: #535bf2;
 }
 
+.programCounter {
+    color: #646cff;
+    text-shadow: 0 0 5px white;
+}
 body {
     margin: 0;
     min-width: 320px;
@@ -89,11 +93,20 @@ button:focus-visible {
 .instructionRow {
     display: grid;
     grid-template-columns: 2rem 1rem 1fr;
+    justify-items: start;
 }
+
+.instructionRowInner {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    min-width: 8rem;
+}
+
 .pastInstructionRow {
     display: grid;
     grid-template-columns: 2rem 1fr;
     margin-right: 3rem;
+    justify-items: start;
 }
 
 .registersViewRow {
