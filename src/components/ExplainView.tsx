@@ -11,7 +11,7 @@ interface ExplainViewProps {
 export function ExplainView({ state }: ExplainViewProps): JSX.Element {
     const instruction: Instruction | null = getNextInstruction(state);
     if (instruction === null) {
-        return <div>No next instruction</div>;
+        return <div>No next instruction - program ended</div>;
     }
     return (
         <div>
