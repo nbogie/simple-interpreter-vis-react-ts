@@ -119,3 +119,8 @@ textArea {
 textArea.dirty {
     outline: 2px solid purple;
 }
+
+.involvedRegister {
+    font-weight: bolder;
+    text-decoration: underline;
+}

@@ -145,3 +145,32 @@ function literalOrRegValue(
         ? sourceRegOrValue
         : registers[sourceRegOrValue];
 }
+
+/* Only used for nice UI to show which registers are involved in each upcoming instruction before it runs */
+export function getInvolvedRegistersForUI(
+    instruction: Instruction
+): RegisterName[] {
+    switch (instruction.command) {
+        case "dec":
+        case "inc":
+            return [instruction.registerName];
+        case "jnz":
+            if (typeof instruction.testRegOrValue === "string") {
+                return [instruction.testRegOrValue];
+            } else {
+                return [];
+            }
+        case "mov": {
+            return [
+                instruction.toRegister,
+                instruction.sourceRegOrValue,
+            ].filter((item) => typeof item === "string") as RegisterName[];
+        }
+
+        default:
+            throw new UnreachableCodeError(
+                instruction,
+                "Unhandled instruction command: " + JSON.stringify(instruction)
+            );
+    }
+}
