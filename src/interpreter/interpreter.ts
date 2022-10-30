@@ -137,7 +137,7 @@ export function executeInstruction(
     }
 }
 
-function literalOrRegValue(
+export function literalOrRegValue(
     sourceRegOrValue: number | RegisterName,
     registers: Registers
 ): number {

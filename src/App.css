@@ -124,3 +124,10 @@ textArea.dirty {
     font-weight: bolder;
     text-decoration: underline;
 }
+
+.regName {
+    font-weight: bolder;
+    outline: 1px solid #646cff;
+    border-radius: 0.2rem;
+    padding: 0.05rem 0.2rem;
+}
